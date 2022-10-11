@@ -59,7 +59,16 @@ app.get('/api/persons/:id', (request, response) => {
     else {
         response.status(404).end()
     }
+})
 
+// Delete certain person
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    // Replace the persons variable with the persons array with deleted person
+    // filtered out
+    persons = persons.filter(person => person.id !== id)
+    console.log(persons)
+    response.status(204).end()
 })
 
 const PORT = 3001
