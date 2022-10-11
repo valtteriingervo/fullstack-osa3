@@ -81,6 +81,15 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
+    const isNameAlreadyInList
+        = persons.find(person => person.name === body.name)
+
+    if (isNameAlreadyInList) {
+        return response.status(400).json({
+            error: 'Name is already in the list. It must be unique'
+        })
+    }
+
     const person = {
         id: getRandomID(),
         name: body.name,
