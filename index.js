@@ -26,12 +26,25 @@ let persons = [
 
 app.use(express.json())
 
+// Home page that greets the visitor
 app.get('/', (request, response) => {
     response.send('<h1>Welcome to the persons site!</h1>')
 })
 
+// For getting all the persons JSON
 app.get('/api/persons', (request, response) => {
     response.json(persons)
+})
+
+// Info page for people and time
+app.get('/info', (request, response) => {
+    const personsLength = persons.length
+    const lengthMsg = `Phonebook has info for ${personsLength} people`
+    const dateMsg = new Date()
+    const htmlMsg =
+        `<p>${lengthMsg}</p>
+         <p>${dateMsg}</p>`
+    response.send(htmlMsg)
 })
 
 const PORT = 3001
