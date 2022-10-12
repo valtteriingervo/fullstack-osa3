@@ -25,8 +25,20 @@ let persons = [
     }
 ]
 
-app.use(morgan('tiny'))
 app.use(express.json())
+
+morgan.token('data',
+    function (req, res) {
+        if (req.method === 'POST') {
+            return JSON.stringify(req.body)
+        }
+        else {
+            return ""
+        }
+    }
+)
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 // Home page that greets the visitor
 app.get('/', (request, response) => {
@@ -69,7 +81,6 @@ app.delete('/api/persons/:id', (request, response) => {
     // Replace the persons variable with the persons array with deleted person
     // filtered out
     persons = persons.filter(person => person.id !== id)
-    console.log(persons)
     response.status(204).end()
 })
 
