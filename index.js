@@ -25,6 +25,7 @@ let persons = [
     }
 ]
 
+app.use(express.static('build'))
 app.use(express.json())
 
 morgan.token('data',
@@ -39,11 +40,6 @@ morgan.token('data',
 )
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
-
-// Home page that greets the visitor
-app.get('/', (request, response) => {
-    response.send('<h1>Welcome to the persons site!</h1>')
-})
 
 // For getting all the persons JSON
 app.get('/api/persons', (request, response) => {
