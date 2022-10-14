@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
 let persons = [
@@ -27,6 +28,7 @@ let persons = [
 
 app.use(express.static('build'))
 app.use(express.json())
+app.use(cors())
 
 morgan.token('data',
     function (req, res) {
@@ -115,7 +117,16 @@ const getRandomID = () => {
     return Math.floor(Math.random() * 10000);
 }
 
-const PORT = 3001
+// Use this endpoint if none of the app. paths work out
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+// Heroku uses process.env.PORT
+const PORT = process.env.PORT || 3001
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
