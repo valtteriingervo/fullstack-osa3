@@ -6,9 +6,9 @@ const Person = require('./models/person')
 
 const app = express()
 
+app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
-app.use(cors())
 
 morgan.token('data',
     function (req, res) {
@@ -56,48 +56,33 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 // Delete certain person
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    // Replace the persons variable with the persons array with deleted person
-    // filtered out
-    persons = persons.filter(person => person.id !== id)
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
-// Add new persons
+// POST new person
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    if (!body.name || !body.number) {
+    if (body.name === undefined || body.name === undefined) {
         return response.status(400).json({
-            error: 'name or number is missing'
+            error: 'name or number missing'
         })
     }
 
-    const isNameAlreadyInList
-        = persons.find(person => person.name === body.name)
-
-    if (isNameAlreadyInList) {
-        return response.status(400).json({
-            error: 'Name is already in the list. It must be unique'
-        })
-    }
-
-    const person = {
-        id: getRandomID(),
+    const person = new Person({
         name: body.name,
-        number: body.number
-    }
+        number: body.number,
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
-
-
-const getRandomID = () => {
-    return Math.floor(Math.random() * 10000);
-}
 
 // Use this endpoint if none of the app. paths work out
 const unknownEndpoint = (request, response) => {
@@ -105,6 +90,18 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 // Heroku uses process.env.PORT
 const PORT = process.env.PORT || 3001
