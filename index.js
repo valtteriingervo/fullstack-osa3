@@ -31,28 +31,33 @@ app.get('/api/persons', (request, response) => {
 })
 
 // Info page for people amount and time
-app.get('/info', (request, response) => {
-    const personsLength = persons.length
-    const lengthMsg = `Phonebook has info for ${personsLength} people`
-    const dateMsg = new Date()
-    const htmlMsg =
-        `<p>${lengthMsg}</p>
-         <p>${dateMsg}</p>`
-    response.send(htmlMsg)
+app.get('/info', (request, response, next) => {
+    Person.find({})
+        .then(persons => {
+            const personsLength = persons.length
+            const lengthMsg = `Phonebook has info for ${personsLength} people`
+            const dateMsg = new Date()
+            const htmlMsg =
+                `<p>${lengthMsg}</p>
+                 <p>${dateMsg}</p>`
+            response.send(htmlMsg)
+        })
+        .catch(error => next(error))
 })
 
-// For displaying a singular person
-app.get('/api/persons/:id', (request, response) => {
-    // Convert id from String to Number
-    const id = Number(request.params.id)
-    // Filter the wanted persons with given ID
-    const wantedPerson = persons.find(persons => persons.id === id)
-    if (wantedPerson) {
-        response.json(wantedPerson)
-    }
-    else {
-        response.status(404).end()
-    }
+// GET a CERTAIN person
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(note => {
+            if (note) {
+                response.json(note)
+            }
+            else {
+                response.status(404).end()
+            }
+
+        })
+        .catch(error => next(error))
 })
 
 // Delete certain person
