@@ -1,0 +1,7 @@
+// Note that our PUT command only changes the number
+PUT http://localhost:3001/api/persons/634d42f062581c736bac6a9a
+Content-Type: application/json
+
+{
+    "number": "044-99999"
+}

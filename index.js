@@ -84,6 +84,21 @@ app.post('/api/persons', (request, response) => {
     })
 })
 
+// PUT -> Change person information
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+        number: body.number,
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
+})
+
 // Use this endpoint if none of the app. paths work out
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
