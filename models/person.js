@@ -11,12 +11,22 @@ mongoose.connect(url)
         console.log('error connection to MongoDB:', error.message)
     })
 
+// Number validation here
 const personSchema = new mongoose.Schema({
     name: {
         type: String,
         minlength: 3
     },
-    number: String,
+    number: {
+        type: String,
+        minglength: 8,
+        validate: {
+            validator: function (nmbr) {
+                return /^(\d{2,3})-(\d{4,})$/.test(nmbr)
+            },
+            message: props => `${props.value} is not a valid phone number! It must be of form 12-34567 or 123-4567 (min 7 numbers total)`
+        }
+    },
 })
 
 personSchema.set('toJSON', {
